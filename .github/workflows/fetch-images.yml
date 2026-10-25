@@ -1,0 +1,45 @@
+# Bir martalik ish: eski saytdagi rasmlarni images/ papkasiga yuklab, repo'ga qo'shadi.
+name: Rasmlarni yuklash
+
+on:
+  push:
+    paths:
+      - ".github/workflows/fetch-images.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rasmlarni yuklab olish
+        run: |
+          set -euo pipefail
+          BASE="https://my-portfolio-rfng.vercel.app"
+          mkdir -p images
+          dl() { curl -fsSL --retry 3 "$BASE/$1" -o "images/$2"; echo "ok: $2"; }
+          dl "photo_2026-10-12_16-12-29.jpg" "begzod.jpg"
+          dl "photo_2026-10-24_23-01-20.jpg" "dadam.jpg"
+          dl "photo_2026-10-24_23-08-42.jpg" "onam.jpg"
+          dl "photo_2026-10-24_22-38-00.jpg" "singlim.jpg"
+          dl "photo_2026-10-24_22-43-46.jpg" "opam.jpg"
+          dl "photo_2026-10-21_17-51-03.jpg" "ustoz.jpg"
+          dl "dost2.jpg"                     "dost-1.jpg"
+          dl "photo_2026-10-22_20-55-30.jpg" "dost-2.jpg"
+          dl "photo_2026-10-22_20-55-52.jpg" "dost-3.jpg"
+          dl "photo_2026-10-22_20-55-58.jpg" "dost-4.jpg"
+          dl "photo_2026-10-22_20-56-07.jpg" "dost-5.jpg"
+          dl "photo_2026-10-22_20-56-07.jpg" "dost-6.jpg"
+          file images/*.jpg
+
+      - name: Repo'ga saqlash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add images
+          git commit -m "Portfolio rasmlarini qo'shish"
+          git push
